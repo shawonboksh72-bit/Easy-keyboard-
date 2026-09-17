@@ -1,0 +1,63 @@
+package com.example.customkeyboard
+
+import android.inputmethodservice.InputMethodService
+import android.view.KeyEvent
+import android.view.View
+import android.widget.Button
+
+class CustomKeyboardService : InputMethodService() {
+
+    override fun onCreateInputView(): View {
+        val keyboardView = layoutInflater.inflate(R.layout.keyboard_view, null)
+
+        // 1. SELECT ALL BUTTON (Right Side)
+        keyboardView.findViewById<Button>(R.id.btn_select_all).setOnClickListener {
+            currentInputConnection?.performContextMenuAction(android.R.id.selectAll)
+        }
+
+        // 2. COPY BUTTON (Right Side)
+        keyboardView.findViewById<Button>(R.id.btn_copy).setOnClickListener {
+            currentInputConnection?.performContextMenuAction(android.R.id.copy)
+        }
+
+        // 3. PASTE BUTTON (Right Side)
+        keyboardView.findViewById<Button>(R.id.btn_paste).setOnClickListener {
+            currentInputConnection?.performContextMenuAction(android.R.id.paste)
+        }
+
+        // Character key bindings (Q-Z)
+        val charKeyIds = listOf(
+            R.id.key_q to "q", R.id.key_w to "w", R.id.key_e to "e", R.id.key_r to "r",
+            R.id.key_t to "t", R.id.key_y to "y", R.id.key_u to "u", R.id.key_i to "i",
+            R.id.key_o to "o", R.id.key_p to "p", R.id.key_a to "a", R.id.key_s to "s",
+            R.id.key_d to "d", R.id.key_f to "f", R.id.key_g to "g", R.id.key_h to "h",
+            R.id.key_j to "j", R.id.key_k to "k", R.id.key_l to "l", R.id.key_z to "z",
+            R.id.key_x to "x", R.id.key_c to "c", R.id.key_v to "v", R.id.key_b to "b",
+            R.id.key_n to "n", R.id.key_m to "m"
+        )
+
+        for ((id, char) in charKeyIds) {
+            keyboardView.findViewById<Button>(id)?.setOnClickListener {
+                currentInputConnection?.commitText(char, 1)
+            }
+        }
+
+        // Backspace
+        keyboardView.findViewById<Button>(R.id.key_backspace).setOnClickListener {
+            currentInputConnection?.deleteSurroundingText(1, 0)
+        }
+
+        // Space
+        keyboardView.findViewById<Button>(R.id.key_space).setOnClickListener {
+            currentInputConnection?.commitText(" ", 1)
+        }
+
+        // Enter
+        keyboardView.findViewById<Button>(R.id.key_enter).setOnClickListener {
+            currentInputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+            currentInputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
+        }
+
+        return keyboardView
+    }
+}
